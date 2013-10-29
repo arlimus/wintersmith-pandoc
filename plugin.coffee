@@ -32,6 +32,13 @@ module.exports = (env, callback) ->
       @_html = @_htmlraw.replace(/(<(a|img)[^>]+(href|src)=")(#[^"]+)/g, '$1' + fullName + '$4')
       # handle relative links
       @_html = @_html.replace(/(<(a|img)[^>]+(href|src)=")(?!http|\/)([^"]+)/g, '$1' + loc + '$4')
+      # handle template syntax correctly (e.g. angularjs)
+      # replace ‘, ’, or “, ” with their ascii counterparts ' and "
+      @_html = @_html.replace /{{.*?}}/g, (i)->
+        i.replace(/[‘’‘’]/g,"'").
+          replace(/[“”]/g  ,'"').
+          replace(/&#39;/g ,"'").
+          replace(/&#34;/g ,'"')
       # handles non-relative links within the site (e.g. /about)
       if base
         @_html = @_html.replace(/(<(a|img)[^>]+(href|src)=")\/([^"]+)/g, '$1' + base + '/$4')
